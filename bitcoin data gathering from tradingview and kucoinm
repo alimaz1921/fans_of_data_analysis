@@ -1,0 +1,97 @@
+import time
+import csv
+import requests
+from GetKucoinSpot import ohlc_call, spot_latest_trade
+import talib
+import numpy
+import pandas
+import tradingview_ta
+from tradingview_ta import TA_Handler
+exchange = "kucoin"
+interval = ["1m", "5m", "15m", "1h", "4h", "1d"]    
+n = 0
+file_header = ["c", "time", "cprice", "open1m", "high1m", "low1m", "close1m", "open5m", "high5m", "low5m", "close5m", "open15m", "high15m", "low15m", "close15m", "open1h", "high1h", "low1h", "close1h", "open4h", "high4h", "low4h", "close4h", "open1d", "high1d", "low1d", "close1d", "rec1m", "buy1m", "sell1m", "neut1m", "rec5m", "buy5m", "sell5m", "neut5m", "rec15m", "buy15m", "sell15m", "neut15m", "rec1h", "buy1h", "sell1h", "neut1h", "rec4h", "buy4h", "sell4h", "neut4h", "rec1d", "buy1d", "sell1d", "neut1d"]
+file_name = time.time()
+file_creation = open(str(file_name) + ".txt", "x")
+file = open(str(file_name) + ".csv", "w")
+writer = csv.writer(file)
+writer.writerow(file_header)
+while True:
+    row = []
+    row.append(str(n))
+    now = time.time()
+    row.append(str(now))
+
+                                                                                    #latest spot trade
+    latest_spot = spot_latest_trade()
+    row.append(str(latest_spot))
+
+    (o, h, l, c) = ohlc_call("1m")
+    row.append(o)
+    row.append(h)
+    row.append(l)
+    row.append(c)
+    time.sleep(3)
+
+    (o, h, l, c) = ohlc_call("5m")
+    row.append(o)
+    row.append(h)
+    row.append(l)
+    row.append(c)
+    time.sleep(3)
+
+
+    (o, h, l, c) = ohlc_call("15m")
+    row.append(o)
+    row.append(h)
+    row.append(l)
+    row.append(c)
+    time.sleep(3)
+
+    (o, h, l, c) = ohlc_call("1h")
+    row.append(o)
+    row.append(h)
+    row.append(l)
+    row.append(c)
+    time.sleep(3)
+
+    (o, h, l, c) = ohlc_call("4h")
+    row.append(o)
+    row.append(h)
+    row.append(l)
+    row.append(c)
+    time.sleep(3)
+
+    (o, h, l, c) = ohlc_call("1d")
+    row.append(o)
+    row.append(h)
+    row.append(l)
+    row.append(c)
+
+
+    i = 0
+    for i in range(6):
+        time.sleep(3)
+        handler = TA_Handler(
+        symbol="BTCUSDT",
+        exchange="kucoin",
+        screener="crypto",
+        interval=interval[i],
+        timeout=None,
+        )
+        analysis = handler.get_analysis()
+        recom = analysis.summary["RECOMMENDATION"]
+        buy = analysis.summary["BUY"]
+        sell = analysis.summary["SELL"]
+        neutral = analysis.summary["NEUTRAL"]
+        row.append(str(recom))
+        row.append(str(buy))
+        row.append(str(sell))
+        row.append(str(neutral))
+        i+=1
+    print(row)
+    file = open(str(file_name) + ".csv", "a")
+    writer = csv.writer(file)
+    writer.writerow(row)
+    n+=1
+    time.sleep(300)
